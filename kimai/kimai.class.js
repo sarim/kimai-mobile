@@ -27,7 +27,33 @@ var Kimai =
         this.jsonApi = url;
         this.server = jQuery.Zend.jsonrpc({url: url});
     },
+    
+    /**
+     * Set Api key.
+     * from a cached storage maybe
+     * @param string key
+     */
+    setApiKey: function(apiKey)
+    {
+        this.apiKey = apiKey;
+    },
 
+    /**
+     * get Api key.
+     */
+    getApiKey: function()
+    {
+        return this.apiKey;
+    },
+    
+    validateApiKey: function()
+    {
+        if (this._doApiCall('getUsers').error)
+            return false;
+        else
+            return true;
+    },
+    
     /**
      * Creates a JSON API Call ID.
      * Actually, the API does not care about it yet, we could also use
@@ -191,6 +217,21 @@ var Kimai =
         }
 
         return false;
+    },
+    
+    setTimesheetRecord: function(recordArr)
+    {
+        var result = this.server.setTimesheetRecord(this.apiKey, recordArr);
+
+        if (typeof result.success != 'undefined' && result.success !== false) {
+            return result.success;
+        }
+
+        if (typeof result.error.msg != 'undefined') {
+            this.error(result.error.msg);
+        }
+
+        return result;        
     },
 
     /**

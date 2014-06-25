@@ -35,7 +35,38 @@ $(document).on('pageshow', '#recorderPage', function(event, ui){
             validateStartStopButton();
         }
     });
+    
+    $('#addRecordBtn').bind('click', function() {
+        $('.recordExtra').show();
+        $('#recorder').parent().hide();
+        $('#addRecordBtn').parent().hide();
+    });
+    
+    $('.datetime').bind('change', function() {
+        
+    });
+    
+    $('#submitRecordBtn').bind('click', function() {
+        
+        var record = {
+            "projectId": $('#projects').val(),
+            "taskId": $('#tasks').val(),
+            "start": $("#startDate").val() + " " + $("#startTime").val(),
+            "end": $("#endDate").val() + " " + $("#endTime").val(),
+            "description": $("#description").val(),
+            "statusId": 1            
+        };
+        
+        var newR = Kimai.setTimesheetRecord(record);
+        
+        if (newR === true) {
+            alert("record added successfully");
+            location.hash = '';
+            location.reload();
+        }
+    });
 });
+
 
 /**
  * Running when page loads.
@@ -52,6 +83,16 @@ $(document).delegate("#loginpage", "pageinit", function() {
     // authentication logic
     $('#btnLogin').bind('click', function() {
         if (Kimai.authenticate($('#username').val(), $('#password').val())) {
+            
+            // remember me logic: save key
+            
+            if ($("#rememberme").prop('checked'))
+            {
+                localStorage.cached_key = Kimai.getApiKey();
+            } else {
+                localStorage.cached_key = '';
+            }
+            
             $.mobile.loading('show');
             $.mobile.changePage('#recorderPage', {transition: 'pop', role: 'page'});
             $.mobile.loading('hide');
@@ -60,6 +101,8 @@ $(document).delegate("#loginpage", "pageinit", function() {
             $(this).parent().find('span.ui-icon').removeClass('ui-icon-check').addClass('ui-icon-alert');
         }
     });
+    
+    
 });
 
 function setApiUrl(apiUrl)

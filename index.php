@@ -19,7 +19,7 @@
 
 // ATTENTION: You can change this setting, if you did not install mobile into the Kimai base directory
 $basePath = '';
-$basePath = '/../kimai/core/';
+$basePath = '../';
 
 // ####################################################################################
 // ##### MOBILE APP CODE BELOW - YOU LIKELY DO NOT WANT TO CHANGE CODE AFTER HERE #####
@@ -80,6 +80,19 @@ $mobileConfig = array(
         if (!Kimai.ping()) {
             $.mobile.changePage('#errorPage', {changeHash: false});
         }
+        
+        // remember me: auto login logic.
+        if (localStorage.cached_key)
+        {
+            Kimai.setApiKey(localStorage.cached_key);
+            if(!Kimai.validateApiKey()) {
+                Kimai.setApiKey('');
+            } else {
+                $.mobile.loading('show');
+                $.mobile.changePage('#recorderPage', {transition: 'pop', role: 'page'});
+                $.mobile.loading('hide');
+            }
+        }
     });
     </script>
 </head>
@@ -111,6 +124,12 @@ $mobileConfig = array(
                 <input name="password" id="password" placeholder="" value="" type="password" />
             </fieldset>
         </div>
+        <div data-role="fieldcontain">
+            <fieldset data-role="controlgroup">
+                <label><input type="checkbox" name="rememberme" id="rememberme"> Remember Me </label>
+            </fieldset>
+        </div>
+        
         <button id="btnLogin" disabled="disabled" data-inline="true" data-icon="star"><?php echo $translate['login_btn']; ?></button>
     </div>
     <div data-theme="<?php echo $mobileConfig['headerFooterTheme']; ?>" data-role="footer" data-position="fixed">
@@ -142,9 +161,53 @@ $mobileConfig = array(
                     <select name="tasks" id="tasks">
 
                     </select>
-        </fieldset>
+                    
+            </fieldset>
+        </div>
+        <div class="recordExtra">
+        <div data-role="fieldcontain">
+            <fieldset data-role="controlgroup">
+                    
+                    <label for="description">Description</label>
+                    <textarea name="description" id="description"></textarea>
+
+            </fieldset>
+        </div>
+        <div data-role="fieldcontain">
+            <fieldset data-role="controlgroup">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" name="startDate" id="startDate" class="datetime">
+
+                    <label for="startTime">Start Time</label>
+                    <input type="time" name="startTime" id="startTime" class="datetime">
+                    
+            </fieldset>
+        </div>
+        <div data-role="fieldcontain">
+            <fieldset data-role="controlgroup">
+                    <label for="endDate">End Date</label>
+                    <input type="date" name="endDate" id="endDate" class="datetime">
+
+                    <label for="endTime">End Time</label>
+                    <input type="time" name="endTime" id="endTime" class="datetime">
+                    
+            </fieldset>
+        </div>
+        <div data-role="fieldcontain">
+            <fieldset data-role="controlgroup">
+                    <label>Duration: <span id="rangeduration"></span></label>
+                    
+            </fieldset>
+        </div>
+        <div data-role="fieldcontain">
+            <fieldset data-role="controlgroup">
+                    <input data-inline="true" type="button" id="submitRecordBtn" name="submitRecordBtn" data-icon="plus" data-theme="c" value="Submit Record">
+            </fieldset>
+        </div>
         </div>
         <input data-inline="true" type="button" id="recorder" name="recorder" data-icon="check" data-theme="c" value="<?php echo $translate['start']; ?>" />
+        <br>
+        <input data-inline="true" type="button" id="addRecordBtn" name="addRecordBtn" data-icon="plus" data-theme="c" value="Add Manual Record">
     </div>
     <div data-theme="<?php echo $mobileConfig['headerFooterTheme']; ?>" data-role="footer" data-position="fixed">
         <h3>
